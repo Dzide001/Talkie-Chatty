@@ -1,6 +1,7 @@
 package com.talkiechatty.talkie_chatty
 
 import android.content.Intent
+import android.os.BatteryManager
 import android.os.PowerManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -14,7 +15,10 @@ class MainActivity : FlutterActivity() {
                 when (call.method) {
                     "startService" -> {
                         startForegroundService(
-                            Intent(this, TalkService::class.java).setAction(TalkService.ACTION_START)
+                            Intent(this, TalkService::class.java)
+                                .setAction(TalkService.ACTION_START)
+                                .putExtra(TalkService.EXTRA_KEEP_AWAKE,
+                                    call.argument<Boolean>("keepAwake") == true)
                         )
                         result.success(null)
                     }
@@ -34,6 +38,10 @@ class MainActivity : FlutterActivity() {
                                 "startedWallMs" to TalkService.startedWallMs,
                                 "lastBeatWallMs" to TalkService.lastBeatWallMs,
                                 "maxGapMs" to TalkService.maxGapMs,
+                                "keepAwake" to TalkService.keepAwake,
+                                "batteryAtStart" to TalkService.batteryAtStart,
+                                "batteryNow" to getSystemService(BatteryManager::class.java)
+                                    .getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
                                 "batteryOptimisationIgnored" to
                                     pm.isIgnoringBatteryOptimizations(packageName)
                             )

@@ -28,6 +28,7 @@ class _SpikePageState extends State<SpikePage> with WidgetsBindingObserver {
   Map<String, dynamic> _status = {};
   String _message = 'Not in a room.';
   Timer? _poll;
+  bool _keepAwake = false;
 
   @override
   void initState() {
@@ -72,7 +73,7 @@ class _SpikePageState extends State<SpikePage> with WidgetsBindingObserver {
       return;
     }
     await Permission.notification.request();
-    await _ch.invokeMethod('startService');
+    await _ch.invokeMethod('startService', {'keepAwake': _keepAwake});
     await Future<void>.delayed(const Duration(milliseconds: 500));
     await _refresh();
     setState(() => _message = _status['serviceRunning'] == true
@@ -103,9 +104,16 @@ class _SpikePageState extends State<SpikePage> with WidgetsBindingObserver {
           Text('Running for: ${_since()}'),
           Text('Last beat: ${_ago(_status['lastBeatWallMs'])}'),
           Text('Largest gap between beats: ${_status['maxGapMs'] ?? 0} ms'),
+          Text('Keep-awake mode: ${_status['keepAwake'] == true ? "ON" : "off"}'),
+          Text('Battery: start ${_status['batteryAtStart']}%  now ${_status['batteryNow']}%'),
           const SizedBox(height: 12),
           Text(_message),
           const Spacer(),
+          SwitchListTile(
+            title: const Text('Keep CPU and Wi-Fi awake (uses battery)'),
+            value: _keepAwake,
+            onChanged: running ? null : (v) => setState(() => _keepAwake = v),
+          ),
           FilledButton(onPressed: running ? null : _join, child: const Text('Start foreground service')),
           const SizedBox(height: 8),
           OutlinedButton(onPressed: running ? _leave : null, child: const Text('Stop')),

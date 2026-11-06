@@ -10,7 +10,10 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
+import android.os.BatteryManager
 import android.os.Looper
+import android.os.PowerManager
+import android.net.wifi.WifiManager
 import android.os.SystemClock
 
 /**
@@ -21,6 +24,7 @@ import android.os.SystemClock
 class TalkService : Service() {
     companion object {
         const val ACTION_START = "com.talkiechatty.START"
+        const val EXTRA_KEEP_AWAKE = "keepAwake"
         const val ACTION_STOP = "com.talkiechatty.STOP"
         const val ACTION_TALK = "com.talkiechatty.TALK_REQUEST"
         const val ACTION_TALK_STOP = "com.talkiechatty.TALK_STOP"
@@ -37,9 +41,13 @@ class TalkService : Service() {
         @Volatile var startedWallMs = 0L
         @Volatile var lastBeatWallMs = 0L
         @Volatile var maxGapMs = 0L
+        @Volatile var keepAwake = false
+        @Volatile var batteryAtStart = -1
         @Volatile private var lastBeatElapsed = 0L
     }
 
+    private var wakeLock: PowerManager.WakeLock? = null
+    private var wifiLock: WifiManager.WifiLock? = null
     private val handler = Handler(Looper.getMainLooper())
     private val beat = object : Runnable {
         override fun run() {
@@ -66,6 +74,10 @@ class TalkService : Service() {
                 try {
                     enterForeground()
                     running = true
+                    keepAwake = intent?.getBooleanExtra(EXTRA_KEEP_AWAKE, false) == true
+                    if (keepAwake) acquireLocks()
+                    batteryAtStart = getSystemService(BatteryManager::class.java)
+                        .getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
                     beatCount = 0; maxGapMs = 0; lastBeatElapsed = 0
                     startedWallMs = System.currentTimeMillis()
                     handler.post(beat)
@@ -125,7 +137,27 @@ class TalkService : Service() {
         getSystemService(NotificationManager::class.java).notify(NOTIF_ID, build())
     }
 
+    // Opt-in experiment only: holds CPU and Wi-Fi awake, which costs battery.
+    private fun acquireLocks() {
+        wakeLock = getSystemService(PowerManager::class.java)
+            .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "talkie:room").apply {
+                setReferenceCounted(false); acquire()
+            }
+        @Suppress("DEPRECATION")
+        wifiLock = getSystemService(WifiManager::class.java)
+            .createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "talkie:room").apply {
+                setReferenceCounted(false); acquire()
+            }
+    }
+
+    private fun releaseLocks() {
+        wakeLock?.let { if (it.isHeld) it.release() }
+        wifiLock?.let { if (it.isHeld) it.release() }
+        wakeLock = null; wifiLock = null
+    }
+
     private fun stopSelfClean() {
+        releaseLocks()
         handler.removeCallbacks(beat)
         running = false
         talkRequested = false
@@ -134,6 +166,7 @@ class TalkService : Service() {
     }
 
     override fun onDestroy() {
+        releaseLocks()
         handler.removeCallbacks(beat)
         running = false
         talkRequested = false

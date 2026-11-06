@@ -1,0 +1,110 @@
+package com.talkiechatty.talkie_chatty
+
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
+import android.os.IBinder
+
+/**
+ * Phase-zero spike: visible ongoing foreground service while the user is in a room.
+ * It does NOT capture audio and does NOT grant the floor. Notification actions only
+ * record a local request; the server grant (contract v0.1) is not wired yet.
+ */
+class TalkService : Service() {
+    companion object {
+        const val ACTION_START = "com.talkiechatty.START"
+        const val ACTION_STOP = "com.talkiechatty.STOP"
+        const val ACTION_TALK = "com.talkiechatty.TALK_REQUEST"
+        const val ACTION_TALK_STOP = "com.talkiechatty.TALK_STOP"
+        private const val CHANNEL = "talkie_room"
+        private const val NOTIF_ID = 1001
+
+        @Volatile var running = false
+        @Volatile var talkRequested = false
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            ACTION_STOP -> { stopSelfClean(); return START_NOT_STICKY }
+            ACTION_TALK -> talkRequested = true
+            ACTION_TALK_STOP -> talkRequested = false
+            else -> if (!running) {
+                try {
+                    enterForeground()
+                    running = true
+                } catch (e: Exception) {
+                    // e.g. microphone permission missing or start not allowed: fail visibly
+                    running = false
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
+            }
+        }
+        if (running) notifyUpdate()
+        return START_NOT_STICKY
+    }
+
+    private fun channel() {
+        val nm = getSystemService(NotificationManager::class.java)
+        if (nm.getNotificationChannel(CHANNEL) == null) {
+            nm.createNotificationChannel(
+                NotificationChannel(CHANNEL, "Room", NotificationManager.IMPORTANCE_LOW)
+            )
+        }
+    }
+
+    private fun action(label: String, act: String, code: Int): Notification.Action {
+        val pi = PendingIntent.getService(
+            this, code, Intent(this, TalkService::class.java).setAction(act),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        return Notification.Action.Builder(null, label, pi).build()
+    }
+
+    private fun build(): Notification {
+        channel()
+        val text = if (talkRequested) "Talk requested (not yet granted)" else "In room, listening"
+        return Notification.Builder(this, CHANNEL)
+            .setContentTitle("Talkie Chatty")
+            .setContentText(text)
+            .setSmallIcon(android.R.drawable.ic_btn_speak_now)
+            .setOngoing(true)
+            .addAction(action("Talk", ACTION_TALK, 1))
+            .addAction(action("Stop talk", ACTION_TALK_STOP, 2))
+            .addAction(action("Leave", ACTION_STOP, 3))
+            .build()
+    }
+
+    private fun enterForeground() {
+        val n = build()
+        if (Build.VERSION.SDK_INT >= 29) {
+            startForeground(NOTIF_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+        } else {
+            startForeground(NOTIF_ID, n)
+        }
+    }
+
+    private fun notifyUpdate() {
+        getSystemService(NotificationManager::class.java).notify(NOTIF_ID, build())
+    }
+
+    private fun stopSelfClean() {
+        running = false
+        talkRequested = false
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
+    override fun onDestroy() {
+        running = false
+        talkRequested = false
+        super.onDestroy()
+    }
+}

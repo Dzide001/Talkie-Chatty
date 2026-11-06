@@ -17,3 +17,5 @@ The tests exercise internal control logic, not a server endpoint. They do not es
 Pending: AI B review of fields, wake provider policy, signaling roles, cancellation semantics, and lease delay accounting; remaining room/server schemas and generated models; authenticated HTTPS/WSS adapter; APNs credentials/provider integration; end-to-end timing harness; device/provisioning access. Phase zero is started, not passed.
 
 Reported physical-phone/provisioning blockers have not been independently re-inventoried. The redundant repo/ checkout remains untouched. This checkpoint introduces no paid deployment or cloud audio fallback.
+
+Coordination update before handoff: AI B reports in issue comment 6697122213 that the user selected Android foreground service with no FCM for now, has one OnePlus 12, no iPhone, and a free Apple account. This draft already rejects FCM and keeps registration provider-specific. Treat OxygenOS idle behavior as a required later test. Android-first delivery has not been approved in this chat and iOS remains in scope but physically unverified. Do not substitute emulator pairing for two-phone evidence.

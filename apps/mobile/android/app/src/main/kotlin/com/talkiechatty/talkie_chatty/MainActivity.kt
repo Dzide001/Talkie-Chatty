@@ -30,6 +30,10 @@ class MainActivity : FlutterActivity() {
                             mapOf(
                                 "serviceRunning" to TalkService.running,
                                 "talkRequested" to TalkService.talkRequested,
+                                "beatCount" to TalkService.beatCount,
+                                "startedWallMs" to TalkService.startedWallMs,
+                                "lastBeatWallMs" to TalkService.lastBeatWallMs,
+                                "maxGapMs" to TalkService.maxGapMs,
                                 "batteryOptimisationIgnored" to
                                     pm.isIgnoringBatteryOptimizations(packageName)
                             )

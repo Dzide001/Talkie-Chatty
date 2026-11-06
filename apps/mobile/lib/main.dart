@@ -44,6 +44,20 @@ class _SpikePageState extends State<SpikePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  String _ago(Object? ms) {
+    final v = (ms as num?)?.toInt() ?? 0;
+    if (v == 0) return '-';
+    final d = DateTime.now().millisecondsSinceEpoch - v;
+    return '${(d / 1000).round()} s ago';
+  }
+
+  String _since() {
+    final v = (_status['startedWallMs'] as num?)?.toInt() ?? 0;
+    if (v == 0 || _status['serviceRunning'] != true) return '-';
+    final s = (DateTime.now().millisecondsSinceEpoch - v) ~/ 1000;
+    return '${s ~/ 60} min ${s % 60} s';
+  }
+
   Future<void> _refresh() async {
     try {
       final s = await _ch.invokeMapMethod<String, dynamic>('status');
@@ -84,6 +98,11 @@ class _SpikePageState extends State<SpikePage> with WidgetsBindingObserver {
           Text('Service: ${running ? "RUNNING" : "stopped"}'),
           Text('Talk requested via notification: ${_status['talkRequested'] == true}'),
           Text('Battery optimisation ignored: ${_status['batteryOptimisationIgnored']}'),
+          const SizedBox(height: 8),
+          Text('Heartbeats (every 10 s): ${_status['beatCount'] ?? 0}'),
+          Text('Running for: ${_since()}'),
+          Text('Last beat: ${_ago(_status['lastBeatWallMs'])}'),
+          Text('Largest gap between beats: ${_status['maxGapMs'] ?? 0} ms'),
           const SizedBox(height: 12),
           Text(_message),
           const Spacer(),

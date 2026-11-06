@@ -8,7 +8,10 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
+import android.os.SystemClock
 
 /**
  * Phase-zero spike: visible ongoing foreground service while the user is in a room.
@@ -26,6 +29,30 @@ class TalkService : Service() {
 
         @Volatile var running = false
         @Volatile var talkRequested = false
+
+        // Idle-test evidence (spike): heartbeat every 10 s, gaps measured on elapsedRealtime
+        // so deep-sleep delays show up as a large gap instead of being hidden.
+        const val BEAT_MS = 10_000L
+        @Volatile var beatCount = 0L
+        @Volatile var startedWallMs = 0L
+        @Volatile var lastBeatWallMs = 0L
+        @Volatile var maxGapMs = 0L
+        @Volatile private var lastBeatElapsed = 0L
+    }
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val beat = object : Runnable {
+        override fun run() {
+            val now = SystemClock.elapsedRealtime()
+            if (lastBeatElapsed != 0L) {
+                val gap = now - lastBeatElapsed
+                if (gap > maxGapMs) maxGapMs = gap
+            }
+            lastBeatElapsed = now
+            lastBeatWallMs = System.currentTimeMillis()
+            beatCount++
+            handler.postDelayed(this, BEAT_MS)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -39,6 +66,9 @@ class TalkService : Service() {
                 try {
                     enterForeground()
                     running = true
+                    beatCount = 0; maxGapMs = 0; lastBeatElapsed = 0
+                    startedWallMs = System.currentTimeMillis()
+                    handler.post(beat)
                 } catch (e: Exception) {
                     // e.g. microphone permission missing or start not allowed: fail visibly
                     running = false
@@ -96,6 +126,7 @@ class TalkService : Service() {
     }
 
     private fun stopSelfClean() {
+        handler.removeCallbacks(beat)
         running = false
         talkRequested = false
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -103,6 +134,7 @@ class TalkService : Service() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacks(beat)
         running = false
         talkRequested = false
         super.onDestroy()

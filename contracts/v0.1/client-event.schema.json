@@ -1,0 +1,837 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Client events \u2014 draft.2",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "floor.request"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "floor.cancel"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "reason": {
+          "enum": [
+            "USER_RELEASED",
+            "AUDIO_INTERRUPTED",
+            "MIC_DENIED",
+            "LAN_DENIED",
+            "NETWORK_CHANGED",
+            "PLAYOUT_FAILED",
+            "PEER_UNREACHABLE"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "localStop"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "reason": {
+          "enum": [
+            "USER_RELEASED",
+            "AUDIO_INTERRUPTED",
+            "MIC_DENIED",
+            "LAN_DENIED",
+            "NETWORK_CHANGED",
+            "PLAYOUT_FAILED",
+            "PEER_UNREACHABLE"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "floor.release"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "grantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "reason": {
+          "enum": [
+            "USER_RELEASED",
+            "AUDIO_INTERRUPTED",
+            "MIC_DENIED",
+            "LAN_DENIED",
+            "NETWORK_CHANGED",
+            "PLAYOUT_FAILED",
+            "PEER_UNREACHABLE"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "grantId"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "floor.renew"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "grantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "grantId"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "floor.sync"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "wakeAcked"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "audioReady"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "peerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "peerId"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "audioUnavailable"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "reason": {
+          "enum": [
+            "AUDIO_INTERRUPTED",
+            "PEER_UNREACHABLE",
+            "LAN_DENIED",
+            "MIC_DENIED",
+            "NETWORK_CHANGED",
+            "PLAYOUT_FAILED"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "audioInterrupted"
+        },
+        "burstId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "enum": [
+            "FOCUS_LOST",
+            "CALL",
+            "ROUTE_LOST"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "audioResumed"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "networkChanged"
+        },
+        "burstId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "enum": [
+            "WIFI_LOST",
+            "INTERFACE_CHANGED"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "permissionState"
+        },
+        "burstId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "permission": {
+          "enum": [
+            "microphone",
+            "localNetwork"
+          ]
+        },
+        "state": {
+          "enum": [
+            "granted",
+            "denied"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "permission",
+        "state"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "resume"
+        },
+        "lastServerSequence": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "lastServerSequence"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "signal.offer"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "recipientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "sdp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "recipientId",
+        "sdp"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "signal.answer"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "recipientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "sdp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "recipientId",
+        "sdp"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "signal.ice"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "recipientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "candidate": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "sdpMid": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "sdpMLineIndex": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 64
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "requestId",
+        "type",
+        "burstId",
+        "recipientId",
+        "candidate",
+        "sdpMid",
+        "sdpMLineIndex"
+      ]
+    }
+  ]
+}

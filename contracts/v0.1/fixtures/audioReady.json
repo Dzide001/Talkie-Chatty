@@ -1,0 +1,9 @@
+{
+  "protocolVersion": "0.1-draft.2",
+  "roomId": "room-fixture",
+  "roomEpoch": "epoch-fixture",
+  "requestId": "request-fixture",
+  "type": "audioReady",
+  "burstId": "burst-fixture",
+  "peerId": "speaker-fixture"
+}

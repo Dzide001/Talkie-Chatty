@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protocolVersion": {
+      "const": "0.1-draft.2"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 48
+    },
+    "platform": {
+      "enum": [
+        "ios",
+        "android"
+      ]
+    },
+    "appVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 16,
+      "items": {
+        "enum": [
+          "lan-webrtc-v1",
+          "ptt-apns-v1",
+          "android-joined-service-v1"
+        ]
+      }
+    },
+    "invite": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 256
+    }
+  },
+  "required": [
+    "protocolVersion",
+    "displayName",
+    "platform",
+    "appVersion",
+    "capabilities",
+    "invite"
+  ]
+}

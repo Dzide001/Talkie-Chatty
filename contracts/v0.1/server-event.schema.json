@@ -1,0 +1,897 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Server events \u2014 draft.2",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "floor.reserved"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "speakerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "recipientIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "prepareTimeoutMs": {
+          "const": 5000
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "burstId",
+        "speakerId",
+        "recipientIds",
+        "prepareTimeoutMs"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "floor.granted"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "grantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "speakerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "leaseMs": {
+          "const": 3000
+        },
+        "maxBurstMs": {
+          "const": 30000
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "burstId",
+        "grantId",
+        "speakerId",
+        "leaseMs",
+        "maxBurstMs"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "floor.lease"
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "grantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "speakerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "remainingLeaseMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3000
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "requestId",
+        "burstId",
+        "grantId",
+        "speakerId",
+        "remainingLeaseMs"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "floor.revoked"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "reason": {
+          "enum": [
+            "RELEASED",
+            "CANCELLED",
+            "LOCAL_STOP",
+            "PREPARE_TIMEOUT",
+            "LEASE_EXPIRED",
+            "BURST_LIMIT",
+            "MEMBER_LEFT",
+            "MEMBER_REMOVED",
+            "SPEAKER_DISCONNECTED",
+            "AUDIO_INTERRUPTED",
+            "NETWORK_CHANGED",
+            "PERMISSION_REVOKED",
+            "AUDIO_UNAVAILABLE",
+            "EPOCH_CHANGED",
+            "NO_RECIPIENTS",
+            "PLAYOUT_FAILED",
+            "MIC_DENIED",
+            "LAN_DENIED"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "burstId",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "roster"
+        },
+        "members": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "participantId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 48
+              },
+              "platform": {
+                "enum": [
+                  "ios",
+                  "android"
+                ]
+              },
+              "controlConnected": {
+                "type": "boolean"
+              },
+              "reachability": {
+                "enum": [
+                  "online",
+                  "wakeable",
+                  "unreachable"
+                ]
+              }
+            },
+            "required": [
+              "participantId",
+              "displayName",
+              "platform",
+              "controlConnected",
+              "reachability"
+            ]
+          }
+        },
+        "floor": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "enum": [
+                "idle",
+                "preparing",
+                "active"
+              ]
+            },
+            "burstId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "grantId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "speakerId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "recipientIds": {
+              "type": "array",
+              "uniqueItems": true,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "remainingMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 5000
+            }
+          },
+          "required": [
+            "phase",
+            "burstId",
+            "grantId",
+            "speakerId",
+            "recipientIds",
+            "remainingMs"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "members",
+        "floor"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "state.snapshot"
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "participantId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "members": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "participantId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 48
+              },
+              "platform": {
+                "enum": [
+                  "ios",
+                  "android"
+                ]
+              },
+              "controlConnected": {
+                "type": "boolean"
+              },
+              "reachability": {
+                "enum": [
+                  "online",
+                  "wakeable",
+                  "unreachable"
+                ]
+              }
+            },
+            "required": [
+              "participantId",
+              "displayName",
+              "platform",
+              "controlConnected",
+              "reachability"
+            ]
+          }
+        },
+        "floor": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "enum": [
+                "idle",
+                "preparing",
+                "active"
+              ]
+            },
+            "burstId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "grantId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "speakerId": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "recipientIds": {
+              "type": "array",
+              "uniqueItems": true,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              }
+            },
+            "remainingMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 5000
+            }
+          },
+          "required": [
+            "phase",
+            "burstId",
+            "grantId",
+            "speakerId",
+            "recipientIds",
+            "remainingMs"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "requestId",
+        "participantId",
+        "members",
+        "floor"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "epochChanged"
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "previousEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "reauthenticate": {
+          "const": true
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "requestId",
+        "previousEpoch",
+        "reauthenticate"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "ack"
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "requestId"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "error"
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "code": {
+          "enum": [
+            "UNAUTHORIZED",
+            "PROTOCOL_MISMATCH",
+            "CAPABILITY_UNSUPPORTED",
+            "BUSY",
+            "NO_RECIPIENTS",
+            "STALE_BURST",
+            "NOT_RECIPIENT",
+            "INVALID_MESSAGE",
+            "WAKE_PROVIDER_UNSUPPORTED",
+            "RATE_LIMITED",
+            "ROOM_FULL",
+            "INVITE_EXPIRED",
+            "EPOCH_MISMATCH",
+            "REQUEST_ID_REUSED",
+            "PEER_UNREACHABLE"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "requestId",
+        "code"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "signal.offer"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "recipientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "sdp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768
+        },
+        "senderId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "type",
+        "burstId",
+        "recipientId",
+        "sdp",
+        "senderId",
+        "serverSequence"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "signal.answer"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "recipientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "sdp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768
+        },
+        "senderId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "type",
+        "burstId",
+        "recipientId",
+        "sdp",
+        "senderId",
+        "serverSequence"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.2"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "type": {
+          "const": "signal.ice"
+        },
+        "burstId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "recipientId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "candidate": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "sdpMid": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "sdpMLineIndex": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 64
+        },
+        "senderId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "type",
+        "burstId",
+        "recipientId",
+        "candidate",
+        "sdpMid",
+        "sdpMLineIndex",
+        "senderId",
+        "serverSequence"
+      ]
+    }
+  ]
+}

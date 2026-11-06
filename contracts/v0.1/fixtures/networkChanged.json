@@ -1,0 +1,9 @@
+{
+  "protocolVersion": "0.1-draft.2",
+  "roomId": "room-fixture",
+  "roomEpoch": "epoch-fixture",
+  "requestId": "request-fixture",
+  "type": "networkChanged",
+  "burstId": null,
+  "reason": "WIFI_LOST"
+}

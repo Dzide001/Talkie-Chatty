@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "protocolVersion": {
+      "const": "0.1-draft.2"
+    },
+    "roomId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "roomEpoch": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "participantId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "memberCredential": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 256
+    },
+    "credentialExpiresAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "serverSequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "members": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "participantId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 48
+          },
+          "platform": {
+            "enum": [
+              "ios",
+              "android"
+            ]
+          },
+          "controlConnected": {
+            "type": "boolean"
+          },
+          "reachability": {
+            "enum": [
+              "online",
+              "wakeable",
+              "unreachable"
+            ]
+          }
+        },
+        "required": [
+          "participantId",
+          "displayName",
+          "platform",
+          "controlConnected",
+          "reachability"
+        ]
+      }
+    },
+    "adminCredential": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 256
+    },
+    "invite": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 256
+    },
+    "inviteExpiresAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "protocolVersion",
+    "roomId",
+    "roomEpoch",
+    "participantId",
+    "memberCredential",
+    "credentialExpiresAt",
+    "serverSequence",
+    "members",
+    "adminCredential",
+    "invite",
+    "inviteExpiresAt"
+  ]
+}

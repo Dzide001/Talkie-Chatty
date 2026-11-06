@@ -1,0 +1,8 @@
+{
+  "protocolVersion": "0.1-draft.1",
+  "roomId": "room-fixture",
+  "roomEpoch": "epoch-fixture",
+  "requestId": "request-wakeAcked",
+  "type": "wakeAcked",
+  "burstId": "burst-fixture"
+}

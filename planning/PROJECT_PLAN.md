@@ -267,5 +267,23 @@ For a small pilot, reserve approximately USD 10–50/month for control-service h
 
 # First implementation assignment
 
+## Review decisions from November 6
+
+The collaborator reports missing physical phones, unresolved Android license acceptance, unconfirmed paid Apple membership/PTT provisioning, and no Go installation on their machine. Treat these as reported inventory, not independently verified facts about every collaborator's environment. Missing devices and provisioning block completion of physical phase-zero gates; they do not block schemas, service tests, app-shell development, or emulator checks. Do not accept licenses or delete the redundant repo/ checkout as part of this review.
+
+Android baseline: maintain the user-visible communication foreground service while joined, started through an allowed visible user interaction. Phase zero will test microphone service behavior plus mediaPlayback where playback requires it, with the corresponding permissions and lifecycle transitions; do not claim phoneCall service privileges without satisfying that type's prerequisites. Verify idle network access under Doze and OEM restrictions rather than assuming a foreground service prevents all suspension. Use discrete Start talking / Stop talking notification actions and a transmission timeout; verify locked-screen accessibility on physical devices. [Foreground service types](https://developer.android.com/develop/background-work/services/fgs/service-types).
+
+FCM remains an optional evaluated wake provider, not a required dependency or guaranteed microphone-start mechanism. High-priority delivery is intended for time-sensitive user-visible notifications and can be deprioritized. A failure of the baseline's long-idle gate requires a documented wake decision and retest before MVP acceptance. [FCM priority guidance](https://firebase.google.com/docs/cloud-messaging/android-message-priority).
+
+Extend protocol v0.1 with platform, appVersion, protocolVersion, and a validated capabilities list. Treat these as compatibility hints, never authorization. Register wake credentials separately using a provider-discriminated structure: APNs PTT registration includes channel and environment; optional FCM registration is accepted only when that provider is implemented and enabled. Never expose tokens in participant rosters or logs. Unsupported required capabilities produce an explicit join error.
+
+The exact target-37 permission is android.permission.ACCESS_LOCAL_NETWORK. Android 10 is a proposed minimum runtime version, while API 37 is a target-SDK behavior; these are different settings. Test oldest/newest supported runtimes early and include intermediate permission/service transitions. [Flutter local-network requirements](https://docs.flutter.dev/platform-integration/android/local-network-permission).
+
+Use emulator/service harnesses for protocol, floor contention, and app-shell checks before device testing. Native PTT wake, microphone timing, network routing, and battery gates still require physical phones. For iOS, verify manual WebRTC audio gating against the pinned wrapper's actual APIs and native PTT activation callbacks; do not infer CallKit integration code transfers unchanged.
+
+Keep minimal APNs wake metadata and authenticated signaling as the baseline. An SDP-in-push variant may be benchmarked only after measuring the complete serialized payload, including escaping and metadata, against the applicable provider limit. Do not assume an offer fits, trim SDP arbitrarily, or bypass sender/room/burst authentication. Retain signaling fallback for oversized or stale offers. A push-carried offer still needs an authenticated answer and ICE/DTLS establishment; it does not eliminate all connection setup. Do not put raw media keys in push payloads. [Apple payload guidance](https://developer.apple.com/documentation/usernotifications/generating-a-remote-notification).
+
+Custom Opus-over-UDP is not an approved automatic fallback. It adds encryption/key establishment, replay protection, packet ordering, loss/jitter handling, audio processing, and lifecycle work. If WebRTC fails the cold-speech gate, diagnose wake, signaling, connection, and audio timing separately; evaluate a native WebRTC adapter or bounded pre-roll first. A transport replacement needs a separate design and schedule decision.
+
 Start both collaborators on phase zero only. Agent A supplies the smallest secure control/APNs test service and shared message fixtures. Agent B supplies the smallest native-backed app that joins, sleeps, wakes, connects local voice, and transmits from system controls. Produce a physical-device recording/timing report and candidate-route evidence before committing to the full app UI or the final schedule.
 

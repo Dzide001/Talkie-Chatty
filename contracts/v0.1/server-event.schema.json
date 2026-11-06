@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Server floor events \u2014 partial review draft",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.1"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "floor.reserved"
+        },
+        "burstId": {
+          "type": "string"
+        },
+        "speakerId": {
+          "type": "string"
+        },
+        "recipientIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "prepareTimeoutMs": {
+          "const": 5000
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "burstId",
+        "speakerId",
+        "recipientIds",
+        "prepareTimeoutMs"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.1"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "floor.granted"
+        },
+        "burstId": {
+          "type": "string"
+        },
+        "grantId": {
+          "type": "string"
+        },
+        "speakerId": {
+          "type": "string"
+        },
+        "leaseMs": {
+          "const": 3000
+        },
+        "maxBurstMs": {
+          "const": 30000
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "burstId",
+        "grantId",
+        "speakerId",
+        "leaseMs",
+        "maxBurstMs"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.1"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "floor.ended"
+        },
+        "burstId": {
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "RELEASED",
+            "CANCELLED",
+            "PREPARE_TIMEOUT",
+            "LEASE_EXPIRED",
+            "MEMBER_LEFT",
+            "SPEAKER_DISCONNECTED",
+            "AUDIO_UNAVAILABLE"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "burstId",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocolVersion": {
+          "const": "0.1-draft.1"
+        },
+        "roomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "roomEpoch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "serverSequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "const": "error"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "code": {
+          "enum": [
+            "UNAUTHORIZED",
+            "PROTOCOL_MISMATCH",
+            "CAPABILITY_UNSUPPORTED",
+            "BUSY",
+            "NO_RECIPIENTS",
+            "STALE_BURST",
+            "NOT_RECIPIENT",
+            "INVALID_MESSAGE",
+            "WAKE_PROVIDER_UNSUPPORTED",
+            "RATE_LIMITED"
+          ]
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "roomId",
+        "roomEpoch",
+        "serverSequence",
+        "type",
+        "requestId",
+        "code"
+      ]
+    }
+  ]
+}

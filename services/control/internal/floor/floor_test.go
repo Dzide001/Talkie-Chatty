@@ -23,7 +23,7 @@ func TestWakeAckIsNotReady(t *testing.T) {
 	if r.State(n).Phase != "preparing" {
 		t.Fatal("wake acknowledgment granted audio")
 	}
-	s, err := r.Ready("b", s.Epoch, s.Burst, n.Add(4*time.Second))
+	s, err := r.ReadyFor("b", "a", s.Epoch, s.Burst, n.Add(4*time.Second))
 	if err != nil || s.Phase != "active" || !s.Deadline.Equal(n.Add(7*time.Second)) {
 		t.Fatalf("separate preparation/lease: %+v %v", s, err)
 	}
@@ -50,16 +50,17 @@ func TestConcurrentRequests(t *testing.T) {
 }
 func TestSleepingMemberAndSnapshot(t *testing.T) {
 	r, n := setup()
+	_ = r.SetWakeable("b", true)
 	r.Disconnect("b")
 	s, e := r.Request("a", n)
 	if e != nil || len(s.Recipients) != 1 || s.Recipients[0] != "b" {
 		t.Fatalf("sleeping member lost: %+v %v", s, e)
 	}
 	_ = r.Join("c")
-	if _, e = r.Ready("c", s.Epoch, s.Burst, n); !errors.Is(e, ErrNotRecipient) {
+	if _, e = r.ReadyFor("c", "a", s.Epoch, s.Burst, n); !errors.Is(e, ErrNotRecipient) {
 		t.Fatal("late join entered burst")
 	}
-	if _, e = r.Ready("b", s.Epoch, s.Burst, n); e != nil {
+	if _, e = r.ReadyFor("b", "a", s.Epoch, s.Burst, n); e != nil {
 		t.Fatal(e)
 	}
 	r.Disconnect("a")
@@ -70,21 +71,21 @@ func TestSleepingMemberAndSnapshot(t *testing.T) {
 func TestExpiryAndStale(t *testing.T) {
 	r, n := setup()
 	s, _ := r.Request("a", n)
-	if _, e := r.Ready("b", s.Epoch, s.Burst, n.Add(Preparation)); !errors.Is(e, ErrStale) {
+	if _, e := r.ReadyFor("b", "a", s.Epoch, s.Burst, n.Add(Preparation)); !errors.Is(e, ErrStale) {
 		t.Fatal("expired preparation accepted")
 	}
 	fresh, _ := r.Request("a", n.Add(Preparation))
-	if _, e := r.Ready("b", s.Epoch, s.Burst, n.Add(Preparation)); !errors.Is(e, ErrStale) {
+	if _, e := r.ReadyFor("b", "a", s.Epoch, s.Burst, n.Add(Preparation)); !errors.Is(e, ErrStale) {
 		t.Fatal("old burst accepted")
 	}
-	if _, e := r.Ready("b", "old-epoch", fresh.Burst, n.Add(Preparation)); !errors.Is(e, ErrStale) {
+	if _, e := r.ReadyFor("b", "a", "old-epoch", fresh.Burst, n.Add(Preparation)); !errors.Is(e, ErrStale) {
 		t.Fatal("old epoch accepted")
 	}
 }
 func TestMaximumBurstAndAuthorization(t *testing.T) {
 	r, n := setup()
 	s, _ := r.Request("a", n)
-	s, _ = r.Ready("b", s.Epoch, s.Burst, n)
+	s, _ = r.ReadyFor("b", "a", s.Epoch, s.Burst, n)
 	if _, e := r.Renew("b", s.Epoch, s.Burst, s.Grant, n); !errors.Is(e, ErrStale) {
 		t.Fatal("listener renewed speaker")
 	}
@@ -128,8 +129,8 @@ func TestSnapshotCannotMutateRoom(t *testing.T) {
 func TestDuplicateReadyDoesNotExtendLease(t *testing.T) {
 	r, n := setup()
 	s, _ := r.Request("a", n)
-	s, _ = r.Ready("b", s.Epoch, s.Burst, n)
-	repeat, e := r.Ready("b", s.Epoch, s.Burst, n.Add(2*time.Second))
+	s, _ = r.ReadyFor("b", "a", s.Epoch, s.Burst, n)
+	repeat, e := r.ReadyFor("b", "a", s.Epoch, s.Burst, n.Add(2*time.Second))
 	if e != nil || !repeat.Deadline.Equal(s.Deadline) {
 		t.Fatal("duplicate ready renewed lease")
 	}
@@ -149,5 +150,116 @@ func TestCancelAndReacquire(t *testing.T) {
 	}
 	if e := r.Cancel("a", s.Epoch, s.Burst, n); !errors.Is(e, ErrStale) {
 		t.Fatal("stale cancellation accepted")
+	}
+}
+
+func TestLocalStopIdempotentAndOldStopSafe(t *testing.T) {
+	r, n := setup()
+	old, _ := r.Request("a", n)
+	for i := 0; i < 2; i++ {
+		if e := r.LocalStop("a", old.Epoch, old.Burst, n); e != nil {
+			t.Fatal(e)
+		}
+	}
+	current, _ := r.Request("b", n)
+	if e := r.LocalStop("a", old.Epoch, old.Burst, n); e != nil {
+		t.Fatal(e)
+	}
+	if r.State(n).Burst != current.Burst {
+		t.Fatal("old stop cancelled new burst")
+	}
+	if e := r.LocalStop("a", "old-epoch", old.Burst, n); !errors.Is(e, ErrStale) {
+		t.Fatal(e)
+	}
+}
+func TestPeerReadinessAndLifecycleRevocation(t *testing.T) {
+	for _, reason := range []string{"AUDIO_INTERRUPTED", "NETWORK_CHANGED", "PERMISSION_REVOKED", "AUDIO_UNAVAILABLE"} {
+		t.Run(reason, func(t *testing.T) {
+			r, n := setup()
+			s, _ := r.Request("a", n)
+			if _, e := r.ReadyFor("b", "wrong-peer", s.Epoch, s.Burst, n); !errors.Is(e, ErrStale) {
+				t.Fatal("wrong peer ready")
+			}
+			if _, e := r.ReadyFor("b", "a", s.Epoch, s.Burst, n); e != nil {
+				t.Fatal(e)
+			}
+			if e := r.Unavailable("b", s.Epoch, s.Burst, reason, n); e != nil {
+				t.Fatal(e)
+			}
+			ended, ok := r.LastEnd()
+			if !ok || ended.Reason != reason || ended.Burst != s.Burst || r.State(n).Phase != "idle" {
+				t.Fatal(ended)
+			}
+		})
+	}
+}
+func TestExpiryReasons(t *testing.T) {
+	r, n := setup()
+	_, _ = r.Request("a", n)
+	r.State(n.Add(Preparation))
+	ended, _ := r.LastEnd()
+	if ended.Reason != "PREPARE_TIMEOUT" {
+		t.Fatal(ended)
+	}
+	s, _ := r.Request("a", n.Add(Preparation))
+	_, _ = r.ReadyFor("b", "a", s.Epoch, s.Burst, n.Add(Preparation))
+	r.State(n.Add(Preparation + Lease))
+	ended, _ = r.LastEnd()
+	if ended.Reason != "LEASE_EXPIRED" {
+		t.Fatal(ended)
+	}
+}
+func TestExpiredStopAndUnknownInterruption(t *testing.T) {
+	r, n := setup()
+	s, _ := r.Request("a", n)
+	if e := r.Unavailable("b", s.Epoch, s.Burst, "arbitrary", n); e == nil {
+		t.Fatal("unknown reason accepted")
+	}
+	if e := r.LocalStop("a", s.Epoch, s.Burst, n.Add(Preparation)); e != nil {
+		t.Fatal(e)
+	}
+	if e := r.Unavailable("b", s.Epoch, s.Burst, "NETWORK_CHANGED", n.Add(Preparation)); !errors.Is(e, ErrStale) {
+		t.Fatal(e)
+	}
+}
+
+func TestOfflineWithoutWakeFailsFast(t *testing.T) {
+	r, n := setup()
+	r.Disconnect("b")
+	if state, _ := r.Reachability("b"); state != "unreachable" {
+		t.Fatal(state)
+	}
+	if _, e := r.Request("a", n); !errors.Is(e, ErrPeerUnreachable) {
+		t.Fatal(e)
+	}
+	if r.State(n).Phase != "idle" {
+		t.Fatal("unreachable peer reserved floor")
+	}
+	_ = r.SetWakeable("b", true)
+	if state, _ := r.Reachability("b"); state != "wakeable" {
+		t.Fatal(state)
+	}
+	if _, e := r.Request("a", n); e != nil {
+		t.Fatal(e)
+	}
+}
+func TestActiveListenerLeaveKeepsOtherRecipients(t *testing.T) {
+	r, n := setup()
+	_ = r.Join("c")
+	s, _ := r.Request("a", n)
+	_, _ = r.ReadyFor("b", "a", s.Epoch, s.Burst, n)
+	_, _ = r.ReadyFor("c", "a", s.Epoch, s.Burst, n)
+	r.Leave("b")
+	current := r.State(n)
+	if current.Phase != "active" || len(current.Recipients) != 1 || current.Recipients[0] != "c" {
+		t.Fatal(current)
+	}
+	r.Leave("c")
+	if r.State(n).Phase != "idle" {
+		t.Fatal("speech without listeners")
+	}
+	ended, _ := r.LastEnd()
+	if ended.Reason != "NO_RECIPIENTS" {
+		t.Fatal(ended)
 	}
 }

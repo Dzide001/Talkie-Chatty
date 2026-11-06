@@ -1,0 +1,8 @@
+{
+  "protocolVersion": "0.1-draft.2",
+  "roomId": "room-fixture",
+  "roomEpoch": "epoch-fixture",
+  "requestId": "request-fixture",
+  "type": "resume",
+  "lastServerSequence": 12
+}

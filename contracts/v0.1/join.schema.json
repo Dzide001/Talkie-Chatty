@@ -1,14 +1,10 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "protocolVersion": {
-      "const": "0.1-draft.1"
-    },
-    "invite": {
-      "type": "string",
-      "minLength": 32,
-      "maxLength": 256
+      "const": "0.1-draft.2"
     },
     "displayName": {
       "type": "string",
@@ -37,15 +33,19 @@
           "android-joined-service-v1"
         ]
       }
+    },
+    "invite": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 256
     }
   },
   "required": [
     "protocolVersion",
-    "invite",
     "displayName",
     "platform",
     "appVersion",
-    "capabilities"
-  ],
-  "$schema": "https://json-schema.org/draft/2020-12/schema"
+    "capabilities",
+    "invite"
+  ]
 }
